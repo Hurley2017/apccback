@@ -97,7 +97,9 @@ def limlog(n):
                                                     for i in range(n))
     return res
 
-
+@app.route('/', methods=['POST'])
+def alive():
+    return "Sup?"
 
 
 
