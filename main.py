@@ -42,13 +42,13 @@ app = Flask(__name__)
 
 
 #Setting up out frontend service address to be allowed by CORS policy
-origin = {
-    "origins":req_origin
-}
-cors = CORS(app, resources={"*": origin})
-app.config['CORS_HEADERS'] = 'Content-Type'
+# origin = {
+#     "origins":req_origin
+# }
+# cors = CORS(app, resources={"*": origin})
+# app.config['CORS_HEADERS'] = 'Content-Type'
 
-
+CORS(app)
 
 
 
