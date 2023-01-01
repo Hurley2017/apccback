@@ -24,7 +24,7 @@ import secrets
 
 
 #embedding credentials securely to deliver on api calls.
-credentials = open("vercel.json")
+credentials = open("credentials.json")
 credentials = json.load(credentials)
 sender_email = credentials["sender_email"]
 password = credentials["password"]
