@@ -39,7 +39,7 @@ req_origin = credentials["origins"]
 app = Flask(__name__)
 
 
-
+CORS(app)
 
 #Setting up out frontend service address to be allowed by CORS policy
 origin = {
