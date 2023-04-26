@@ -7,8 +7,8 @@
 from pytz import timezone 
 from datetime import datetime
 from flask import Flask, request
+#from bson import ObjectId
 from pymongo import MongoClient
-from bson import ObjectId
 from flask_cors import CORS, cross_origin
 from email.message import EmailMessage
 import smtplib
@@ -23,11 +23,11 @@ import secrets
 load_dotenv()
 
 #embedding credentials securely to deliver on api calls.
-sender_email = os.environ.get["sender_email"]
-password = os.environ.get["password"]
-blocked = os.environ.get["blocked"]
-connection_sent = os.environ.get["connection_sent"]
-req_origin = os.environ.get["origins"]
+sender_email = os.environ.get("sender_email")
+password = os.environ.get("password")
+blocked = os.environ.get("blocked")
+connection_sent = os.environ.get("connection_sent")
+req_origin = os.environ.get("origins")
 
 
 
