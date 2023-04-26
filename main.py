@@ -46,7 +46,9 @@ cors = CORS(app, resources={"*": origin})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 
-
+@app.route('/')
+def return_alive():
+    return "ALIVE BITCH"
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~#
