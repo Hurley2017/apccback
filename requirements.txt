@@ -1,4 +1,3 @@
-gunicorn==20.0.4
 Flask
 pymongo
 pymongo[srv]
