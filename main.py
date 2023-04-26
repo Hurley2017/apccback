@@ -21,13 +21,12 @@ import string
 import secrets
 
 load_dotenv()
-credentials = os.environ.get
 #embedding credentials securely to deliver on api calls.
-sender_email = credentials["sender_email"]
-password = credentials["password"]
-blocked = credentials["blocked"]
-connection_sent = credentials["connection_sent"]
-req_origin = credentials["origins"]
+sender_email = os.environ.get["sender_email"]
+password = os.environ.get["password"]
+blocked = os.environ.get["blocked"]
+connection_sent = os.environ.get["connection_sent"]
+req_origin = os.environ.get["origins"]
 
 
 
@@ -46,9 +45,7 @@ cors = CORS(app, resources={"*": origin})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 
-@app.route('/')
-def return_alive():
-    return "ALIVE BITCH"
+
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~#
