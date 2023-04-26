@@ -14,18 +14,15 @@ from email.message import EmailMessage
 import smtplib
 import base64
 import random
+from dotenv import load_dotenv
+import os
 import json
 import string
 import secrets
 
-
-
-
-
-
+load_dotenv()
+credentials = os.environ.get
 #embedding credentials securely to deliver on api calls.
-credentials = open("credentials.json")
-credentials = json.load(credentials)
 sender_email = credentials["sender_email"]
 password = credentials["password"]
 blocked = credentials["blocked"]
