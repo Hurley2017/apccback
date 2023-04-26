@@ -7,7 +7,7 @@
 from pytz import timezone 
 from datetime import datetime
 from flask import Flask, request
-import pymongo
+from pymongo import MongoClient
 from bson import ObjectId
 from flask_cors import CORS, cross_origin
 from email.message import EmailMessage
@@ -21,6 +21,7 @@ import string
 import secrets
 
 load_dotenv()
+
 #embedding credentials securely to deliver on api calls.
 sender_email = os.environ.get["sender_email"]
 password = os.environ.get["password"]
@@ -104,7 +105,7 @@ def alive():
 #api for creating new superadmin
 @app.route('/supernew', methods=['POST'])
 def supernew():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     sdetails = railwaydb["superadmin"]
     sname = request.json["sname"]
@@ -152,7 +153,7 @@ def supernew():
 #api for generating and sending OTP to superadmin after successfull pushing of credentials
 @app.route('/superadminotp', methods=['POST'])
 def superadminlockotp():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     sdetails = railwaydb["superadmin"] #pointing to superadmin collection
     myotp = random.randint(100000,999999) #generating random 6 digit value
@@ -181,7 +182,7 @@ def superadminlockotp():
 #api for checking if current session of superadmin is valid or not
 @app.route('/returnpasssuper', methods=['POST'])
 def returnpasssuper():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["superadmin"] #pointing to superadmin collection
     ifuser = adetails.find_one({"super_aid":request.json["sid"], "session":request.json["session"]}) #finding superadmin supporting the session
@@ -198,7 +199,7 @@ def returnpasssuper():
 @app.route('/superadminlock', methods=['POST'])
 def superadminlockdb():
     flagtime = datetime.now(timezone("Asia/Kolkata")) #getting current time flag
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["superadmin"] #pointing to superadmin collection
     superpass = request.json["spass"]
@@ -234,7 +235,7 @@ def superadminlockdb():
 #api for adding new Admins into the system
 @app.route('/superadmin/insert', methods=['POST'])
 def registeradmin():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["admin"] #pointing to admin collection
     sdetails = railwaydb["superadmin"] #pointing to superadmin collection
@@ -296,7 +297,7 @@ def registeradmin():
 @app.route('/superadmin/change', methods=['PUT'])
 def adminchange():
     st = ""
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adminCollection = railwaydb["admin"] #pointing to admin collection
     sdetails = railwaydb["superadmin"] #pointing to superadmin collection
@@ -350,7 +351,7 @@ def adminchange():
 @app.route('/superadmin/delete', methods=['DELETE'])
 def admindelete():
     st = ""
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adminCollection = railwaydb["admin"] #pointing to admin collection
     sdetails = railwaydb["superadmin"] #pointing to superadmin collection
@@ -392,7 +393,7 @@ def alladminerror():
 @app.route('/superadmin/alladmin', methods=['POST']) #if accessed with session
 def alladmin():
     st = ""
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["admin"] #pointing to admin collection
     sdetails = railwaydb["superadmin"] #pointing to superadmin collection
@@ -423,7 +424,7 @@ def alladmin():
 #api for destroying superadmin session variable and loggin out
 @app.route('/superadminlogout', methods=['POST'])
 def superadminlogout():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     sdetails = railwaydb["superadmin"] #pointing to superadmin collection
     sdetails.update_one({"super_aid":request.json["sid"], "session":request.json["session"]}, {"$set":{"session":""}}) #session reset to mark superadmin as offline
@@ -436,7 +437,7 @@ def superadminlogout():
 #api for fetching super admin name for Welcome page
 @app.route('/superadmininfo', methods=['POST'])
 def superadmininfodb():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["superadmin"] #pointing to superadmin collection
     adminuser = adetails.find_one({"super_aid":request.json["sid"] , "session":request.json["session"]}) #checking if the superadmin session is still valid or not
@@ -454,7 +455,7 @@ def superadmininfodb():
 #api for generating and sending OTP to admin after successfull pushing of credentials
 @app.route('/adminotp', methods=['POST'])
 def adminlockotp():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["admin"] #pointing to the admin collection of Railway database
     myotp = random.randint(100000,999999) #generating random 6 digit otp for auth
@@ -483,7 +484,7 @@ def adminlockotp():
 #api for checking if current session of admin is valid or not
 @app.route('/returnpass', methods=['POST'])
 def returnpass():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["admin"] #pointing admin collection of the Railway database
     ifuser = adetails.find_one({"aid":request.json["aid"], "session":request.json["session"]}) #checking if the session is still valid or not
@@ -502,7 +503,7 @@ def adminlockdb():
     st = "incorrect credentials" #standard value 
     flagtime = datetime.now(timezone("Asia/Kolkata")) #flagging current timezone and date time
     flagtime = flagtime.strftime("%d/%m/%Y %H:%M:%S") #extracting only the useful information from the long time string
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["admin"] #poiting to the admin collection from Railway database
     adminpass = request.json["apass"]
@@ -538,7 +539,7 @@ def adminlockdb():
 #api for destroying admin session variable and loggin out
 @app.route('/adminlogout', methods=['POST'])
 def adminlogout():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     sdetails = railwaydb["admin"] #pointing the admin collection of Railway database
     sdetails.update_one({"aid":request.json["aid"], "session":request.json["session"]}, {"$set":{"session":""}}) #resetting the session of the current logged in admin
@@ -551,7 +552,7 @@ def adminlogout():
 #api for fetching admin name for the Welcome page
 @app.route('/admininfo', methods=['POST'])
 def admininfodb():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["admin"] #pointing the admin collection of Railway database
     adminuser = adetails.find_one({"aid":request.json["aid"], "session":request.json["session"]}) #checking if the session is still valid or not
@@ -571,7 +572,7 @@ def hehe():
 @app.route('/admin/allfeed', methods=['POST']) #if accessed with session
 def feedbackall():
     st = ""
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = railwaydb["admin"] #pointing the admin collection of Railway database
     valid = adetails.find_one({"aid":request.json["aid"], "session":request.json["session"]}) #checking the admin session if it is still valid
@@ -595,7 +596,7 @@ def feedbackall():
 #api for adding a new train to DB
 @app.route('/admin/train/insert', methods=['POST'])
 def t_insert():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db = mongodb_client["Railway"] #pointing to the Railway database for operation
     trainCollection = db["Trains"] #pointing the Trains collection of Railway database
     coachCollection = db["Coaches"] #pointing the Coaches collection of Railway database
@@ -663,7 +664,7 @@ def t_insert():
 @app.route('/admin/train/edit', methods=['PUT'])
 def t_edit():
     st = ""
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     trainCollection = railwaydb["Trains"] #pointing the Trains collection of Railway database
     adminCollection = railwaydb["admin"] #pointing the admin collection of Railway database
@@ -712,7 +713,7 @@ def t_edit():
 #api for removing a train from the system
 @app.route('/admin/train/delete', methods=['DELETE'])
 def t_delete():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     trainCollection = railwaydb["Trains"] #pointing the Trains collection of Railway database
     coachCollection = railwaydb["Coaches"] #pointing the Coaches collection of Railway database
@@ -771,7 +772,7 @@ def t_delete():
 @app.route('/admin/coach/insert', methods=['POST'])
 def c_insert():
     message = ""
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     coachCollection = railwaydb["Coaches"] #pointing the Coached collection of Railway database
     trainCollection = railwaydb["Trains"] #pointing the Trains collection of Railway database
@@ -831,7 +832,7 @@ def c_insert():
 @app.route('/admin/coach/delete', methods=['DELETE'])
 def c_delete():
     msge = ""
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     coachCollection = railwaydb["Coaches"] #pointing the Coaches collection of Railway database
     trainCollection = railwaydb["Trains"] #pointing the Trains collection of Railway database
@@ -890,7 +891,7 @@ def c_delete():
 @app.route('/admin/coach/change', methods=['PUT'])
 def ctypechange():
     st = ""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     coachCollection = db["Coaches"] #pointing the Coaches collection of Railway database
     adminCollection = db["admin"] #pointing the admin collection of Railway database
@@ -941,7 +942,7 @@ def ctypechange():
 @app.route('/admin/cancelticket', methods=['PUT'])
 def cticket():
     st = ""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     ticketCollection = db["Tickets"] #pointing the Tickets collection of Railway database
     coachCollection = db["Coaches"] #pointing the Coaches collection of Railway database
@@ -982,7 +983,7 @@ def cticket():
 @app.route('/admin/alltickets', methods=['POST'])
 def alltickets():
     st = ""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     trainCollection = db["Trains"] #pointing the Trains collection of Railway database
     ticketCollection = db["Tickets"] #pointing the Tickets collection of Railway database
@@ -1027,7 +1028,7 @@ def mothertableerror():
 @app.route('/admin/mothertable', methods=['POST']) #wheather accessed with session information
 def mothertable():
     st = ""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     adetails = db["admin"] #pointing the admin collection of Railway database
     valid = adetails.find_one({"aid":request.json["aid"], "session":request.json["session"]}) #checking if session is still active
@@ -1076,7 +1077,7 @@ def mothertable():
 #api for sending a reset password otp
 @app.route('/forgototp', methods=['POST'])
 def forgototp():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     userCollection = railwaydb["users"] #pointing to the users collection of Railway database
     user = userCollection.find_one({"umail":request.json["umail"]}) #flagging the user that has the email.
@@ -1097,7 +1098,7 @@ def forgototp():
 #api for checking if entered OTP is the same as Database OTP
 @app.route('/checkotp', methods=['POST'])
 def checkotp():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     userCollection = railwaydb["users"] #pointing to the users collection of Railway database
     user = userCollection.find_one({"umail":request.json["umail"]}) #flagging the user that has the email.
@@ -1120,7 +1121,7 @@ def lmaonuub():
     return blocked #triggers force system ui shutdown, however backend stays alive
 @app.route('/changepass', methods=['POST']) #user with valid data
 def changepass():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     userCollection = railwaydb["users"] #pointing to users collection of Railway database
     user = userCollection.find_one({"umail":request.json["umail"]}) #flagging the account that needs password change
@@ -1139,7 +1140,7 @@ def changepass():
 #api for resetting 'forgot api' OTP
 @app.route('/resetotpuser', methods=['POST'])
 def resetotpuser():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     details = railwaydb["users"] #pointing to users collection of Railway database
     details.update_one({"umail":request.json["umail"]}, {"$set":{"myotp":""}}) #resetting the otp
@@ -1152,7 +1153,7 @@ def resetotpuser():
 #api for checking id current session of user is valid or not
 @app.route('/returnpassuser', methods=['POST'])
 def returnpassuser():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     udetails = railwaydb["users"] #pointing to users collection of Railway database
     valid = udetails.find_one({"ph_num":request.json["ph_num"], "session":request.json["session"]}) #checking if user session is still valid or not
@@ -1169,7 +1170,7 @@ def returnpassuser():
 @app.route('/userlock', methods=['POST'])
 def userlockdb():
     flagtime = datetime.now(timezone("Asia/Kolkata")) #flagging the current date and time data
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     udetails = railwaydb["users"] #pointing to users collection of Railway database
     userpass = request.json["upass"] 
@@ -1189,7 +1190,7 @@ def userlockdb():
 #api for user registration
 @app.route('/registeruser', methods=['POST'])
 def registeruser():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     udetails = railwaydb["users"] #pointing to users collection of Railway database
     umail = request.json["umail"] 
@@ -1245,7 +1246,7 @@ def registeruser():
 #api for destroying user session variable and loggin out
 @app.route('/userlogout', methods=['POST'])
 def userlogout():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     udetails = railwaydb["users"] #pointing to users collection of Railway database
     udetails.update_one({"ph_num":request.json["ph_num"], "session":request.json["session"]}, {"$set":{"session":""}}) #after requesting logout resetting the session .
@@ -1258,7 +1259,7 @@ def userlogout():
 #api for fetching user name for the Welcome page
 @app.route('/userinfo', methods=['POST'])
 def userinfodb():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     udetails = railwaydb["users"] #pointing to users collection of Railway database
     user = udetails.find_one({"ph_num":request.json["ph_num"], "session":request.json["session"]}) #flagging the user with given session details
@@ -1275,7 +1276,7 @@ def userinfodb():
 @app.route('/train/view', methods=['POST'])
 def t_view():
     st = ""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     trainCollection = db["Trains"] #pointing to Trains collection of Railway database
     if request.json["istation"] == "From Station" or request.json["dstation"] == "To Station": #checking the veracity
@@ -1321,7 +1322,7 @@ def t_view():
 @app.route('/coach/view', methods=['POST'])
 def c_view():
     st = ""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     coachCollection = db['Coaches'] #pointing to Coaches collection of Railway database
     trainCollection = db["Trains"] #pointing to Trains collection of Railway database
@@ -1357,7 +1358,7 @@ def c_view():
 @app.route('/seat/tobook', methods=['POST'])
 def tobook():
     selectedinput = 0
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     coachCollection = db["Coaches"] #pointing to Coaches collection of Railway database
     trainCollection = db["Trains"] #pointing to Trains collection of Railway database
@@ -1442,7 +1443,7 @@ def tobook():
 @app.route('/seat/book', methods=['POST'])
 def book():
     ticket = ""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     coachCollection = db["Coaches"] #pointing to Coaches collection of Railway database
     trainCollection = db["Trains"] #pointing to Trains collection of Railway database
@@ -1504,7 +1505,7 @@ def book():
 @app.route('/ticketview', methods=['POST'])
 def ticketview():
     st=""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     ticketCollection = db["Tickets"] #pointing to Tickets collection of Railway database
     trainCollection = db["Trains"] #pointing to Trains collection of Railway database
@@ -1552,7 +1553,7 @@ def ticketview():
 #api for user ticket cancel
 @app.route('/ticketcancel', methods=['PUT'])
 def cancelticket():
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     ticketCollection = db["Tickets"] #pointing to Tickets collection of Railway database
     coachCollection = db["Coaches"] #pointing to Coaches collection of Railway database
@@ -1595,7 +1596,7 @@ def cancelticket():
 @app.route('/seat/gettime', methods=['POST'])
 def gettime():
     st = ""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     trainCollection = db["Trains"] #pointing to Trains collection of Railway database
     if request.json["istation"] == "Select a Station" or request.json["dstation"] == "Select a Station": #checking the veracity
@@ -1629,7 +1630,7 @@ def gettime():
 @app.route('/time_table', methods=['GET'])
 def timetable():
     st = ""
-    mongodb_client=pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client=MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     db=mongodb_client["Railway"] #pointing to the Railway database for operation
     trainCollection = db["Trains"] #pointing to Trains collection of Railway database
     start = 1 #for serialization
@@ -1665,7 +1666,7 @@ def timetable():
 #api for automatically resettng OTP after 3 minutes
 @app.route('/resetotp', methods=['POST'])
 def resetotp():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     details = railwaydb[request.json["collection"]] #pointing to given collection of Railway database
     password = encryptpassword(request.json["pass"]) #encrypting password for database comparison
@@ -1679,7 +1680,7 @@ def resetotp():
 #api for posting feedback in the system [disabled for the final system]       
 @app.route('/wrtous', methods=['POST'])
 def feedback():
-    mongodb_client = pymongo.MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
+    mongodb_client = MongoClient(connection_sent) #estabilishing connection to MongoDB database after getting value from credentials
     railwaydb = mongodb_client["Railway"] #pointing to the Railway database for operation
     fdetails = railwaydb["feedbacks"] #pointing to feedback collection of Railway database
     fdetails.insert_one({"cname":request.json["cname"], "feedback": request.json["feedback"]}) #inserting new data to feedbacks collection
